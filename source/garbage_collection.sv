@@ -31,12 +31,12 @@ module garbage_collection(
 	begin
 		nxt_fifo = fifo;
 		nxt_clean_num = clean_num;
-		if(active_request)
+		if(gcif.active_request)
 		begin
 			nxt_fifo = fifo >> BLOCK_W;
 			nxt_clean_num = clean_num - 1;
 		end
-		else if(fifo_write_en || fifo_recover_en)
+		else if(gccif.fifo_write_en || gcif.fifo_recover_en)
 		begin
 			nxt_fifo = fifo & (fifo_in << clean_num * BLOCK_W);
 			nxt_clean_num = clean_num + 1;
@@ -53,7 +53,7 @@ module garbage_collection(
 	assign gcif.move_flag = gccif.move_flag;
 	assign gcif.gc_interrupt = gccif.gc_interrupt;
 	assign gcif.gc_request = gccif.gc_reqeust;
-	assign gcif.req_done = gccif.req_done;
+	assign gcif.request_done = gccif.request_done;
 	
 	assign gcif.active_blk = fifo[0];
 	assign fifo_in = gccif.initial_fifo ? count_val : (gcif.fifo_recover_en ? recover_blk : erase_blk);
