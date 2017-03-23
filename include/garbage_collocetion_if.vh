@@ -1,6 +1,14 @@
 `ifndef GARBAGE_COLLECTION_IF_VH
 `define GARBAGE_COLLECTION_IF_VH
 
+/*
+	Shichen Lin
+	Garbage collection interface
+*/
+
+`include "NVM_pkg.vh"
+import NVM_pkg::*;
+
 interface garbage_collection_if();
 	logic fifo_recover_en;
 	block_t erase_blk, invalid_blk, active_blk;

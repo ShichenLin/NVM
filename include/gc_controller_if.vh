@@ -1,3 +1,14 @@
+`ifndef GC_CONTROLLER_IF_VH
+`define GC_CONTROLLER_IF_VH
+
+/*
+	Shichen Lin
+	Garbage collection controller interface
+*/
+
+`include "NVM_pkg.vh"
+import NVM_pkg::*;
+
 interface gc_controller_if;
 	parameter FIFO_SIZE_BIT_NUM = 4;
 	logic gc_ini, gc_start;
@@ -13,3 +24,5 @@ interface gc_controller_if;
 		output move_flag, gc_interrupt, gc_request, request_done, request_blk_clean, initial_fifo, fifo_write_en
 	);
 endinterface
+
+`endif

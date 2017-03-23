@@ -1,6 +1,11 @@
 `ifndef NVM_PKG_VH
 `define NVM_PKG_VH
 
+/*
+	Shichen Lin
+	NVM flush controller type package
+*/
+
 package nvm_pkg();
 	parameter WORD_W = 32;
 	parameter ADDR_W = 16;
