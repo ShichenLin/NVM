@@ -9,7 +9,8 @@ package nvm_pkg();
 	parameter AHB_MODE_W = 3;
 	parameter FLASH_MODE_W = 4;
 	parameter SYSTEM_MODE_W = 4;
-	
+	parameter BLOCK_NUM = 1024; //2^BLOCK_W
+	parameter PAGE_NUM = 64; //2^PAGE_W
 	typedef logic [7:0] byte_t;
 	typedef logic [WORD-1:0] word_t;
 	typedef logic [ADDR_W-1:0] addr_t;

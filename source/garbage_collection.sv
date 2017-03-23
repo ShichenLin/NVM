@@ -1,6 +1,3 @@
-`include "garbage_collection_if.vh"
-`include "gc_controller_if.vh"
-
 module garbage_collection(
 	input logic CLK, nRST,
 	garbage_collection_if.gc gcif
@@ -8,8 +5,18 @@ module garbage_collection(
 
 	parameter FIFO_SIZE = 16;
 	parameter FIFO_SIZE_BIT_NUM = 4;
-	block_t [FIFO_SIZE-1:0] fifo, nxt_fifo;
-	logic [FIFO_SIZE_BIT_NUM -1:0] clean_num, nxt_clean_num;
+	
+	block_t [FIFO_SIZE-1:0] fifo;
+	block_t [FIFO_SIZE-1:0] nxt_fifo;
+	logic [FIFO_SIZE_BIT_NUM-1:0] clean_num, nxt_clean_num;
+	block_t ini_blk_count, nxt_ini_blk_count;
+	page_t dirty_page_count [BLOCK_NUM-1:0];
+	page_t nxt_dirty_page_count [BLOCK_NUM-1:0];
+	
+	//intermediate variable
+	logic ini_full;
+	block_t most_dirty_blk, nxt_most_dirty_blk;
+	
 	gc_controller_if gccif();
 	
 	gc_controller gcc (gccif);
@@ -20,17 +27,32 @@ module garbage_collection(
 		begin
 			fifo <= 0;
 			clean_num <= 0;
+			ini_block_num <= 0;
+			dirty_page_count <= `{default:`0};
+			most_dirty_blk <= 0;
 		end
 		else begin
 			fifo <= nxt_fifo;
 			clean_num <= nxt_clean_num;
+			ini_blk_count <= nxt_ini_blk_count;
+			dirty_page_count <= nxt_dirty_page_count;
+			most_dirty_blk <= nxt_most_dirty_blk;
 		end
 	end
-		
+	
 	always_comb
 	begin
+		if(gccif.initial_fifo && ini_blk_count < 1023) nxt_ini_blk_count = ini_blk_count + 1;
+		else nxt_ini_blk_count = ini_blk_count;
 		nxt_fifo = fifo;
 		nxt_clean_num = clean_num;
+		nxt_dirty_page_count = dirty_page_count;
+		nxt_most_dirty_blk <= most_dirty_blk;
+		if(gcif.invalid_flag)
+		begin
+			nxt_dirty_page_count[gcif.invalid_blk] = dirty_page_count[gcif.invalid_blk] + 1;
+			if(dirty_page_count[gcif.invalid_blk] + 1 > dirty_page_count[most_dirty_blk]) nxt_most_dirty_blk = gcif.invalid_blk;
+		end
 		if(gcif.active_request)
 		begin
 			nxt_fifo = fifo >> BLOCK_W;
@@ -54,7 +76,8 @@ module garbage_collection(
 	assign gcif.gc_interrupt = gccif.gc_interrupt;
 	assign gcif.gc_request = gccif.gc_reqeust;
 	assign gcif.request_done = gccif.request_done;
-	
+	assign gcif.erase_blk = most_dirty_blk;
 	assign gcif.active_blk = fifo[0];
-	assign fifo_in = gccif.initial_fifo ? count_val : (gcif.fifo_recover_en ? recover_blk : erase_blk);
+	assign gcif.ini_full = ini_blk_count == 1023;
+	assign fifo_in = gccif.initial_fifo ? count_val : (gcif.fifo_recover_en ? recover_blk : erase_blk);	
 endmodule

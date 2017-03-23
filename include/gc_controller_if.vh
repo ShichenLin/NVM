@@ -1,5 +1,3 @@
-`include "NVM_pkg.vh"
-
 interface gc_controller_if;
 	parameter FIFO_SIZE_BIT_NUM = 4;
 	logic gc_ini, gc_start;
