@@ -1,3 +1,8 @@
+/*
+	Shichen Lin
+	Garbage collectior
+*/
+
 `include "garbage_collection_if.vh"
 
 module garbage_collection(

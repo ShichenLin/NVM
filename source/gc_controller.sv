@@ -1,3 +1,8 @@
+/*
+	Shichen Lin
+	Garbage collection controller
+*/
+
 `include "gc_controller_if.vh"
 
 module gc_controller(
